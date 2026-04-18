@@ -1,2 +1,0 @@
-# TQDYTI
-ceshilianjie
