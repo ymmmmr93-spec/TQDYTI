@@ -1,197 +1,246 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>恋恋风尘式青春人格测试</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
-        body{background:#f7f3ee;color:#3d3a34;line-height:1.7}
-        .container{max-width:700px;margin:0 auto;padding:20px}
-        .title{text-align:center;margin:30px 0;font-size:22px;font-weight:500}
-        .desc{text-align:center;color:#666;margin-bottom:30px;font-size:14px}
-        .question{background:#fff;border-radius:12px;padding:20px;margin-bottom:15px}
-        .q-title{font-weight:500;margin-bottom:12px}
-        .options{display:flex;flex-direction:column;gap:10px}
-        .option{padding:12px;border:1px solid #ddd;border-radius:8px;cursor:pointer}
-        .option:hover{border-color:#bfa98e;background:#fcf9f5}
-        .option.active{background:#bfa98e;color:white;border-color:#bfa98e}
-        .btn{background:#bfa98e;color:white;border:none;padding:14px 30px;border-radius:30px;margin:30px auto;display:block;font-size:16px;cursor:pointer}
-        .btn:disabled{background:#ccc}
-        .result{display:none;background:#fff;border-radius:12px;padding:30px;margin:30px 0}
-        .result-title{font-size:18px;font-weight:500;margin-bottom:15px}
-        .result-type{color:#bfa98e;font-weight:bold;margin-bottom:10px}
-        .result-desc{line-height:1.8}
-        .progress{text-align:center;margin:20px 0;color:#666}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>恋恋风尘式青春人格测试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+body{background:#f6f3ee;color:#333;line-height:1.7}
+.container{max-width:720px;margin:0 auto;padding:24px 20px 80px}
+.title{text-align:center;font-size:24px;margin:30px 0 10px;font-weight:500}
+.subtitle{text-align:center;color:#666;margin-bottom:40px;font-size:15px}
+.question-box{background:#fff;border-radius:14px;padding:24px;margin-bottom:18px}
+.question-text{font-size:16px;margin-bottom:18px;font-weight:500}
+.option{padding:14px 16px;border:1px solid #e6e2dc;border-radius:10px;margin-bottom:12px;cursor:pointer}
+.option:hover{border-color:#d4c2ac;background:#fcf9f5}
+.option.active{background:#d4c2ac;color:#fff;border-color:#d4c2ac}
+.progress{text-align:center;color:#666;margin:10px 0 24px}
+.btn{background:#d4c2ac;color:#fff;border:none;border-radius:30px;padding:16px 36px;margin:40px auto;display:block;font-size:16px;cursor:pointer}
+.btn:disabled{background:#ddd}
+.result{display:none;background:#fff;border-radius:14px;padding:32px;margin:40px 0}
+.result-title{font-size:18px;margin-bottom:16px}
+.result-dim{font-size:20px;font-weight:bold;color:#b99e7e;margin-bottom:16px}
+.result-role{font-size:16px;margin-bottom:12px;font-weight:500}
+.result-desc{line-height:1.9;font-size:15px;color:#333}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="title">恋恋风尘式青春人格测试</div>
-        <div class="desc">清淡、克制、细碎遗憾的台青片青春人格</div>
-        <div class="progress" id="progress">第 1 题 / 共 12 题</div>
+<div class="container">
+<div class="title">恋恋风尘式青春人格测试</div>
+<div class="subtitle">清淡、克制、细碎遗憾的台系青春</div>
+<div class="progress" id="progress"></div>
+<div id="questionContainer"></div>
+<button id="submitBtn" class="btn" disabled>查看结果</button>
+<div class="result" id="result">
+<div class="result-title">你的青春人格</div>
+<div class="result-dim" id="resultDim"></div>
+<div class="result-role" id="resultRole"></div>
+<div class="result-desc" id="resultDesc"></div>
+</div>
+</div>
 
-        <div id="questions"></div>
-        <button class="btn" id="submit" disabled>查看结果</button>
+<script>
+// 题目（完全按你的原文）
+const questions = [
+  {
+    title: "1. 放学后的傍晚，你更倾向于？",
+    A: "A. 沿着田埂/街巷慢慢走，看夕阳落幕，不说话，只享受独处的安静【岸】",
+    B: "B. 约上好友，在旧桥/夜市/街头闲逛，有一搭没一搭聊天，享受当下的热闹【野】",
+    dim: "an_ye"
+  },
+  {
+    title: "2. 面对平淡单调的日常，你会？",
+    A: "A. 习惯并接纳，在重复的日子里找细碎美好（看云、等信、翻旧书）【岸】",
+    B: "B. 偶尔偷偷出逃，去陌生的地方逛一逛，哪怕只是看一眼不一样的风景【野】",
+    dim: "an_ye"
+  },
+  {
+    title: "3. 有人约你去大城市闯荡，你第一反应是？",
+    A: "A. 犹豫退缩，更贪恋熟悉的环境与安稳，怕陌生的喧嚣与未知【岸】",
+    B: "B. 有一丝心动，哪怕害怕，也想试着走出舒适圈，看看不一样的世界【野】",
+    dim: "an_ye"
+  },
+  {
+    title: "4. 青春里，你更在意的是？",
+    A: "A. 家人的冷暖、三餐的烟火、当下的安稳，不追求轰轰烈烈【光】",
+    B: "B. 没说出口的心意、偶然的离别、来不及圆满的约定，藏着淡淡的怅惘【雾】",
+    dim: "guang_wu"
+  },
+  {
+    title: "5. 看到旧物（旧书信、老照片、旧自行车），你会想到？",
+    A: "A. 当时的温暖瞬间、一起相处的人，只记美好，不纠结遗憾【光】",
+    B: "B. 那些没完成的承诺、悄悄错过的时光，心里泛起一丝说不清的难过【雾】",
+    dim: "guang_wu"
+  },
+  {
+    title: "6. 面对喜欢的人，你会更关注？",
+    A: "A. 他/她的日常状态，有没有好好吃饭、有没有烦心事，默默关心【光】",
+    B: "B. 和他/她相处的细碎瞬间，哪怕只是并肩走一段路，也会反复回想【雾】",
+    dim: "guang_wu"
+  },
+  {
+    title: "7. 被人误解，或是心里难过时，你会？",
+    A: "A. 不辩解、不倾诉，一个人找个安静的地方，默默消化所有情绪，从不外露【温】",
+    B: "B. 不刻意隐忍，会释放情绪，或是找最信任的人倾诉【烈】",
+    dim: "wen_lie"
+  },
+  {
+    title: "8. 喜欢的人要离开，你会？",
+    A: "A. 默默送他/她到车站，不说挽留的话，只说一句“保重”，转身自己难过【温】",
+    B: "B. 鼓起勇气，把藏在心里的心意说出来，哪怕知道可能没有结果【烈】",
+    dim: "wen_lie"
+  },
+  {
+    title: "9. 面对不合理的要求（家人过度期待、朋友勉强请求），你会？",
+    A: "A. 不忍拒绝，默默承受，哪怕自己委屈，也不想让别人为难【温】",
+    B: "B. 委婉拒绝，坚守自己的心意，不勉强自己迎合别人【烈】",
+    dim: "wen_lie"
+  },
+  {
+    title: "10. 面对没有结果的喜欢，你会？",
+    A: "A. 顺其自然，不刻意争取，把心意藏在心里，慢慢放下【缓】",
+    B: "B. 默默坚守，哪怕不能在一起，也会一直关注他/她，守住心中的期待【骤】",
+    dim: "huan_zhou"
+  },
+  {
+    title: "11. 毕业/离别来临，你会？",
+    A: "A. 接受离别，觉得成长本就是不断遇见与分开，不刻意挽留【缓】",
+    B: "B. 努力留住当下的痕迹（拍照、写信），希望能记住每一个相处的瞬间【骤】",
+    dim: "huan_zhou"
+  },
+  {
+    title: "12. 面对未来的不确定性，你会？",
+    A: "A. 不焦虑、不纠结，一步一步往前走，接受未来的所有可能【缓】",
+    B: "B. 悄悄规划，哪怕只是模糊的方向，也想努力朝着自己期待的样子走【骤】",
+    dim: "huan_zhou"
+  }
+];
 
-        <div class="result" id="result">
-            <div class="result-title">你的专属青春人格</div>
-            <div class="result-type" id="type"></div>
-            <div class="result-desc" id="desc"></div>
-        </div>
+// 结果库（一字未改你的原文）
+const resultData = {
+  "岸光温缓": {
+    role: "阿远（《恋恋风尘》）/小凯《一页台北》/ 文清《悲情城市》【清淡烟火型】",
+    desc: "你内敛隐忍、务实真诚，习惯接纳平淡日常，不追求轰轰烈烈，藏着细碎的温柔与释然。面对独处、离别与未来，始终保持平和的心态，不纠结遗憾、不焦虑迷茫，在安静中慢慢成长，贴合最朴素、最真实的青春模样，像阿远的踏实、陈怀钧的淡然、文清的沉静，于烟火气中藏着不慌不忙的成长力量。"
+  },
+  "岸光温骤": {
+    role: "冬冬《冬冬的假期》【安稳坚守型】",
+    desc: "你温暖明朗、内敛克制，在意家人与当下的安稳，习惯默默付出、不轻易外露情绪。但面对喜欢的人和心中的期待，却有着不轻易放弃的坚守，不刻意张扬，却会悄悄守护自己的心意，像冬冬一样，在平淡的假期里，藏着纯粹的善意与执着，于安稳中藏着少年人的坚守。"
+  },
+  "岸光烈缓": {
+    role: "Susie《一页台北》【坦荡释然型】",
+    desc: "你温暖明朗、真诚坦荡，在意当下的美好，不纠结过往遗憾，面对不合理的要求会委婉拒绝，不勉强自己迎合他人。面对离别与未来，能坦然接受所有可能，但遇到喜欢的人，会勇敢表达心意，不藏藏掖掖，像Susie一样，鲜活坦荡，于温暖中带着锋芒，在成长中保持释然。"
+  },
+  "岸光烈骤": {
+    role: "张士豪《蓝色大门》【热烈安稳型】",
+    desc: "你温暖明朗、热烈真诚，在意家人与当下的烟火气，却也敢于表达心意、坚守自我。面对喜欢的人会主动争取，面对未来会悄悄规划，不畏惧未知，也不放弃心中的期待，像张士豪一样，带着少年人的鲜活与坦荡，在安稳的底色上，书写热烈的青春故事。"
+  },
+  "岸雾温缓": {
+    role: "孟克柔《蓝色大门》【青涩自愈型】",
+    desc: "你温柔敏感、内敛克制，习惯把心事藏在沉默里，面对旧物与离别，会泛起淡淡的怅惘，却不刻意纠缠。被误解时不辩解、不倾诉，默默消化所有情绪，面对成长的迷茫与未说出口的心意，不刻意强求，慢慢接纳自己，在安静中自愈，藏着青春里最纯粹的小秘密，像孟克柔一样，青涩又坚韧。"
+  },
+  "岸雾温骤": {
+    role: "阿云《恋恋风尘》/ 小四《牯岭街少年杀人事件》/ 康南《窗外》【遗憾坚守型】",
+    desc: "你温柔敏感、念旧执着，安于平淡的环境，却藏着不甘与遗憾，面对旧物与离别，总会想起未完成的承诺。习惯把心事藏在心底，不轻易倾诉，被误解时默默承受，但面对心中的期待与喜欢的人，会始终坚守，哪怕没有结果，也不愿轻易放下，像阿云的等待、小四的执念、康南的隐忍，藏着青春与时代的双重怅惘。"
+  },
+  "岸雾烈缓": {
+    role: "婷婷《一一》【敏感释然型】",
+    desc: "你温柔敏感、真诚坦荡，面对旧物与离别，会有淡淡的难过，却能坦然接受成长中的遇见与分开。被误解时不刻意隐忍，会找信任的人倾诉情绪，面对喜欢的人，会关注相处的细碎瞬间，却不执着于结果，像婷婷一样，在青涩的心事中慢慢成长，于敏感中藏着释然，在脆弱中学会坚强。"
+  },
+  "岸雾烈骤": {
+    role: "小明《牯岭街少年杀人事件》/ 江雁容《窗外》【坚韧挣扎型】",
+    desc: "你温柔敏感却带着锋芒，在现实与情感的夹缝中挣扎，面对旧物与离别，会藏着不甘与难过，却敢于表达自己的情绪。被误解时会倾诉，面对不合理的要求会委婉拒绝，面对喜欢的人和心中的期待，会勇敢争取、始终坚守，哪怕身处困境，也不轻易妥协，像小明的挣扎、江雁容的叛逆，藏着青春里的不甘与坚韧。"
+  },
+  "野光温缓": {
+    role: "小猫王《牯岭街少年杀人事件》【天真治愈型】",
+    desc: "你开朗天真、纯粹通透，喜欢热闹，愿意走出舒适圈，却也能享受独处的安静。在意当下的美好，不纠结遗憾，被误解时会默默消化情绪，面对离别与未来，能坦然接受所有可能，带着少年气慢慢成长，像小猫王一样，鲜活纯粹，是青春里最治愈的一抹亮色，于热闹中藏着温柔。"
+  },
+  "野光温骤": {
+    role: "解锁你的专属隐藏人格🌿 不必复刻他人模样，你自带温柔与坚守，便是自己青春故事里，最独特的主人公。",
+    desc: "你开朗外放、温暖克制，喜欢热闹，愿意尝试新鲜事物，走出舒适圈，却也习惯默默付出、不轻易外露情绪。在意当下的烟火气，面对喜欢的人和心中的期待，会悄悄坚守，不刻意张扬，却始终不放弃，既有少年人的鲜活，又有成年人的隐忍，在热烈的青春里，藏着不慌不忙的坚守。"
+  },
+  "野光烈缓": {
+    role: "张士豪《蓝色大门》/ Susie《一页台北》【鲜活坦荡型】",
+    desc: "你开朗坦荡、热烈纯粹，喜欢热闹，愿意走出舒适圈，看看不一样的世界，在意当下的快乐，不纠结过往遗憾。面对喜欢的人会勇敢表达心意，面对不合理的要求会委婉拒绝，面对离别与未来，能坦然接受所有可能，带着少年气与真诚成长，鲜活又有力量，像张士豪的阳光、Susie的坦荡，是青春里最鲜活的模样。"
+  },
+  "野光烈骤": {
+    role: "幸运解锁隐藏人格🔥 热烈又执着，鲜活又坦荡，你从不是别人的配角，而是自己青春电影里，自带光芒的主角。",
+    desc: "你开朗外放、热烈真诚，喜欢热闹，敢于走出舒适圈，不畏惧陌生与未知。面对喜欢的人会勇敢争取，面对心中的期待会始终坚守，不轻易放弃，被误解时会坦然倾诉情绪，不刻意隐忍，既有少年人的锋芒，又有执着的心意，在热烈的青春里，坚定地朝着自己期待的方向前行。"
+  },
+  "野雾温缓": {
+    role: "奇遇隐藏人格✨ 叛逆中藏着温柔，释然中带着坦荡，你的青春无需复刻，独一无二，便是最好的模样。",
+    desc: "你开朗外放、温柔敏感，喜欢热闹，愿意走出舒适圈，却也能默默消化自己的情绪。面对旧物与离别，会泛起淡淡的怅惘，却不纠结遗憾，被误解时不辩解、不倾诉，面对喜欢的人，会藏起心意、顺其自然，既有叛逆的底色，又有释然的心态，在青春的迷茫中，慢慢找到属于自己的节奏。"
+  },
+  "野雾温骤": {
+    role: "解锁限定隐藏人格🌙 敏感又执着，鲜活又内敛，你自带专属青春底色，是自己人生故事里，无可替代的主人公。",
+    desc: "你开朗外放、念旧执着，喜欢热闹，愿意尝试新鲜事物，却也习惯把心事藏在心底。面对旧物与离别，会想起未完成的承诺，心中泛起难过，被误解时默默承受，面对喜欢的人和心中的期待，会始终坚守，哪怕没有结果，也不愿轻易放下，在叛逆的外表下，藏着一颗执着又敏感的心。"
+  },
+  "野雾烈缓": {
+    role: "幸运邂逅隐藏人格🌿 温柔中藏着锋芒，释然中带着坚守，你的青春独一无二，你便是自己青春里，最动人的主角。",
+    desc: "你开朗外放、温柔敏感，喜欢热闹，敢于走出舒适圈，不畏惧未知，面对旧物与离别，会有淡淡的怅惘，却能坦然接受。被误解时会倾诉情绪，不刻意隐忍，面对喜欢的人，会关注相处的细碎瞬间，却不执着于结果，在叛逆的青春里，藏着敏感与释然，在成长中学会与遗憾和解。"
+  },
+  "野雾烈骤": {
+    role: "哈尼《牯岭街少年杀人事件》【热烈悲剧型】",
+    desc: "你叛逆纯粹、热烈勇敢，不满平庸、敢于反抗，喜欢热闹，愿意走出舒适圈，对自由与纯粹有着极致的追求。面对旧物与离别，会藏着不甘与遗憾，被误解时会坦然表达情绪，面对喜欢的人和心中的理想，会勇敢争取、始终坚守，哪怕最终是遗憾，也不愿妥协，像哈尼一样，鲜活又令人心疼，藏着青春里最热烈的坚守与最无奈的悲剧。"
+  }
+};
+
+// 答题记录
+const answer = { an_ye: [], guang_wu: [], wen_lie: [], huan_zhou: [] };
+let current = 0;
+
+// 渲染题目
+function render() {
+  const q = questions[current];
+  const container = document.getElementById("questionContainer");
+  container.innerHTML = `
+    <div class="question-box">
+      <div class="question-text">${q.title}</div>
+      <div class="option" data-val="A">${q.A}</div>
+      <div class="option" data-val="B">${q.B}</div>
     </div>
+  `;
+  document.getElementById("progress").innerText = `第 ${current+1} 题 / 共 12 题`;
 
-    <script>
-        const questions = [
-            {
-                q:"1. 放学后傍晚，你更倾向于？",
-                A:"A. 沿田埂街巷慢慢走，安静独处【岸】",
-                B:"B. 约好友闲逛街头，享受热闹【野】",
-                dim:"any",key:"an_ye"
-            },
-            {
-                q:"2. 面对平淡日常，你会？",
-                A:"A. 接纳平淡，找细碎美好【岸】",
-                B:"B. 偶尔出逃，看新风景【野】",
-                dim:"any",key:"an_ye"
-            },
-            {
-                q:"3. 有人约你去大城市闯荡，第一反应是？",
-                A:"A. 犹豫退缩，贪恋安稳【岸】",
-                B:"B. 心动想尝试，走出舒适圈【野】",
-                dim:"any",key:"an_ye"
-            },
-            {
-                q:"4. 青春里你更在意？",
-                A:"A. 家人烟火、当下安稳【光】",
-                B:"B. 未说出口的心意、淡淡怅惘【雾】",
-                dim:"any",key:"guang_wu"
-            },
-            {
-                q:"5. 看到旧物，你会想到？",
-                A:"A. 温暖瞬间，只记美好【光】",
-                B:"B. 未完成的承诺，心里难过【雾】",
-                dim:"any",key:"guang_wu"
-            },
-            {
-                q:"6. 面对喜欢的人，你更关注？",
-                A:"A. 日常状态，默默关心【光】",
-                B:"B. 细碎相处瞬间，反复回想【雾】",
-                dim:"any",key:"guang_wu"
-            },
-            {
-                q:"7. 被误解难过时，你会？",
-                A:"A. 不辩解，默默消化【温】",
-                B:"B. 释放情绪，找信任的人说【烈】",
-                dim:"any",key:"wen_lie"
-            },
-            {
-                q:"8. 喜欢的人要离开，你会？",
-                A:"A. 默默送别，不说挽留【温】",
-                B:"B. 说出心意，不留遗憾【烈】",
-                dim:"any",key:"wen_lie"
-            },
-            {
-                q:"9. 面对不合理要求，你会？",
-                A:"A. 不忍拒绝，默默承受【温】",
-                B:"B. 委婉拒绝，坚守自己【烈】",
-                dim:"any",key:"wen_lie"
-            },
-            {
-                q:"10. 面对没有结果的喜欢，你会？",
-                A:"A. 顺其自然，慢慢放下【缓】",
-                B:"B. 默默坚守，守住期待【骤】",
-                dim:"any",key:"huan_zhou"
-            },
-            {
-                q:"11. 毕业离别，你会？",
-                A:"A. 接受离别，坦然面对【缓】",
-                B:"B. 努力留住痕迹，记住瞬间【骤】",
-                dim:"any",key:"huan_zhou"
-            },
-            {
-                q:"12. 面对未来不确定，你会？",
-                A:"A. 不焦虑，一步一步走【缓】",
-                B:"B. 悄悄规划，朝期待前行【骤】",
-                dim:"any",key:"huan_zhou"
-            }
-        ];
+  document.querySelectorAll(".option").forEach(opt => {
+    opt.onclick = () => {
+      document.querySelectorAll(".option").forEach(o => o.classList.remove("active"));
+      opt.classList.add("active");
+      answer[q.dim].push(opt.dataset.val);
+      setTimeout(() => {
+        current++;
+        if (current < 12) render();
+        else document.getElementById("submitBtn").disabled = false;
+      }, 200);
+    };
+  });
+}
 
-        const answers = {an_ye:[], guang_wu:[], wen_lie:[], huan_zhou:[]};
-        let current = 0;
+// 计算维度
+function getDim(key, A, B) {
+  const arr = answer[key];
+  let a = 0, b = 0;
+  arr.forEach(v => v === "A" ? a++ : b++);
+  return a >= b ? A : B;
+}
 
-        function render(){
-            const dom = document.getElementById("questions");
-            dom.innerHTML = "";
-            const item = questions[current];
-            const div = document.createElement("div");
-            div.className = "question";
-            div.innerHTML = `
-                <div class="q-title">${item.q}</div>
-                <div class="options">
-                    <div class="option" data-ans="A">${item.A}</div>
-                    <div class="option" data-ans="B">${item.B}</div>
-                </div>
-            `;
-            dom.appendChild(div);
-            document.getElementById("progress").innerText = `第 ${current+1} 题 / 共 12 题`;
+// 计算结果
+document.getElementById("submitBtn").onclick = () => {
+  const an_ye = getDim("an_ye", "岸", "野");
+  const guang_wu = getDim("guang_wu", "光", "雾");
+  const wen_lie = getDim("wen_lie", "温", "烈");
+  const huan_zhou = getDim("huan_zhou", "缓", "骤");
+  const key = an_ye + guang_wu + wen_lie + huan_zhou;
+  const res = resultData[key];
 
-            document.querySelectorAll(".option").forEach(opt=>{
-                opt.onclick = ()=>{
-                    document.querySelectorAll(".option").forEach(o=>o.classList.remove("active"));
-                    opt.classList.add("active");
-                    answers[item.key].push(opt.dataset.ans);
-                    setTimeout(()=>{
-                        current++;
-                        if(current<12){
-                            render();
-                        }else{
-                            document.getElementById("submit").disabled = false;
-                        }
-                    },300);
-                }
-            });
-        }
+  document.getElementById("resultDim").innerText = key;
+  document.getElementById("resultRole").innerText = res.role;
+  document.getElementById("resultDesc").innerText = res.desc;
+  document.getElementById("result").style.display = "block";
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+};
 
-        function calc(key,a,b){
-            const arr = answers[key];
-            let ca=0,cb=0;
-            arr.forEach(i=>i==="A"?ca++:cb++);
-            return ca>=cb ? a : b;
-        }
-
-        const resultMap = {
-            "岸光温缓":"【清淡烟火型】阿远（恋恋风尘）/小凯（一页台北）/文清（悲情城市）｜内敛隐忍、务实真诚，在烟火气里安静成长。",
-            "岸光温骤":"【安稳坚守型】冬冬（冬冬的假期）｜温暖明朗、内敛克制，于安稳中藏着执着。",
-            "岸光烈缓":"【坦荡释然型】Susie（一页台北）｜温暖坦荡，带点锋芒，坦然接受一切。",
-            "岸光烈骤":"【热烈安稳型】张士豪（蓝色大门）｜温暖热烈、真诚坦荡，少年气十足。",
-            "岸雾温缓":"【青涩自愈型】孟克柔（蓝色大门）｜温柔敏感、沉默自愈，青涩又坚韧。",
-            "岸雾温骤":"【遗憾坚守型】阿云（恋恋风尘）/小四（牯岭街）/康南（窗外）｜念旧执着，藏着青春怅惘。",
-            "岸雾烈缓":"【敏感释然型】婷婷（一一）｜温柔敏感，在脆弱中学会坚强。",
-            "岸雾烈骤":"【坚韧挣扎型】小明（牯岭街）/江雁容（窗外）｜敏感带锋芒，在现实中挣扎不妥协。",
-            "野光温缓":"【天真治愈型】小猫王（牯岭街）｜开朗纯粹，青春里最治愈的亮色。",
-            "野光温骤":"【隐藏人格】🌿 温柔与坚守并存，你是自己青春的主人公。",
-            "野光烈缓":"【鲜活坦荡型】张士豪/Susie｜开朗坦荡、热烈纯粹，鲜活有力量。",
-            "野光烈骤":"【隐藏人格】🔥 热烈又执着，你是自带光芒的主角。",
-            "野雾温缓":"【隐藏人格】✨ 叛逆中藏温柔，独一无二。",
-            "野雾温骤":"【隐藏人格】🌙 敏感又执着，无可替代的主人公。",
-            "野雾烈缓":"【隐藏人格】🌿 温柔中带锋芒，最动人的主角。",
-            "野雾烈骤":"【热烈悲剧型】哈尼（牯岭街）｜叛逆纯粹、热烈勇敢，令人心疼。"
-        };
-
-        document.getElementById("submit").onclick = ()=>{
-            const an_ye = calc("an_ye","岸","野");
-            const guang_wu = calc("guang_wu","光","雾");
-            const wen_lie = calc("wen_lie","温","烈");
-            const huan_zhou = calc("huan_zhou","缓","骤");
-            const type = an_ye + guang_wu + wen_lie + huan_zhou;
-            document.getElementById("type").innerText = type;
-            document.getElementById("desc").innerText = resultMap[type] || "未知人格";
-            document.querySelector(".result").style.display = "block";
-            window.scrollTo(0,document.body.scrollHeight);
-        };
-
-        render();
-    </script>
+render();
+</script>
 </body>
 </html>
